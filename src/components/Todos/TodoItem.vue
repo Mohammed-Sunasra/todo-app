@@ -1,13 +1,10 @@
 <template>
     <base-card>
-    <div>
-        <label for=""></label>
-        <header>{{ title }}</header>
-        <p>{{ description }}</p>
-        <p>{{ status }}</p>
-        <p>{{ priority }}</p>
+        <header><h2>{{ title }}</h2></header>
+        <h3>Description: {{ description }}</h3>
+        <p>Status: {{ status.toUpperCase() }}</p>
+        <p>Priority: {{ priority.toUpperCase() }}</p>
         <base-button @click="deleteTodoItem(id)">Delete</base-button>
-    </div>
     </base-card>
 </template>
 

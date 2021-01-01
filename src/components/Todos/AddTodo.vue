@@ -1,20 +1,90 @@
 <template>
-    <form action="">
+    <form @submit.prevent="addTodo">
         <div class="form-control">
-            <label for="age">Your Age (Years)</label>
-            <input id="age" name="age" type="number" v-model="userAge" />
+            <label for="title">Title</label>
+            <input id="title" name="title" type="text" v-model="title" />
+        </div>
+        <div class="form-control">
+            <label for="description">Description</label>
+            <textarea id="description" rows="5" name="description" v-model="description"></textarea>
+        </div>
+        <div class="form-control">
+            <label for="status">Status</label>
+            <select name="status" id="status" v-model="status">
+                <option value="todo">Todo</option>
+                <option value="inprogress">InProgress</option>
+                <option value="onhold">OnHold</option>
+                <option value="done">Done</option>
+            </select>
+        </div>
+        <div class="form-control">
+            <label for="status">Priority</label>
+            <div>
+                <input id="low" name="low" type="radio" value="low" v-model="priority" />
+                <label for="low">Low</label>
+            </div>
+            <div>
+                <input id="medium" name="medium" type="radio" value="medium" v-model="priority" />
+                <label for="medium">Medium</label>
+            </div>
+            <div>
+                <input id="high" name="high" type="radio" value="high" v-model="priority" />
+                <label for="high">High</label>
+            </div>
+        </div>
+        <div class="form-control">
+            <base-button>Add</base-button>
+        </div>
+        <div class="form-control">
+            <p v-if="invalidInput">Please make sure you enter all the details</p>
+        </div>
+        <div class="form-control">
+            <p v-if="invalidInput">Please make sure you enter all the details</p>
         </div>
     </form>
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
-    
+    data(){
+        return {
+            title: '',
+            description: '',
+            status: '',
+            priority: '',
+            invalidInput: false,
+            errorMessage: ' '
+        }
+    },
+    methods: {
+        addTodo(){
+            if(this.title === '' || this.description === '' || this.status === null || this.priority === null){
+                this.invalidInput = true
+                return
+            }
+        axios.post("https://todo-app-7a0f5-default-rtdb.firebaseio.com/todos.json", {
+            title: this.title,
+            description: this.description,
+            status: this.status,
+            priority: this.priority
+        }).then(response => {
+            if (response.status !== 200){
+                throw new Error('Could not save data') 
+            }
+        }).catch(error => {
+            console.log(error)
+            this.errorMessage = error
+        })
+
+        }
+    }
 }
 </script>
 
 <style scoped>
-<style scoped>
+
 form {
   margin: 2rem auto;
   max-width: 40rem;
@@ -38,7 +108,8 @@ h2 {
 }
 
 input,
-select {
+select,
+textarea {
   display: block;
   width: 100%;
   font: inherit;
@@ -76,5 +147,4 @@ button:active {
   border-color: #002350;
   background-color: #002350;
 }
-</style>
 </style>
