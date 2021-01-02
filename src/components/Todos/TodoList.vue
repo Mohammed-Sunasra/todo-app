@@ -2,6 +2,7 @@
         <!-- <p v-if="loadingData">Loading Data.......</p>
         <p v-else-if="todosExist">No data found</p> -->
         <p v-if="deletedSuccessfully" :class="{'delete-success': deletedSuccessfully}">{{ deleteMessage }}</p>
+        <p v-if="!todosExist">No tasks exist</p>
         <todo-item v-for="todo in todos" :key="todo.id"
                 :id="todo.id"
                 :title="todo.title"
@@ -10,8 +11,6 @@
                 :priority="todo.priority"
                 @delete-todo="deleteTodoItem">
         </todo-item>
-        
-        
 </template>
 
 <script>
@@ -39,40 +38,41 @@ export default {
     },
     methods: {
         fetchTodos(){
-        this.loadingData = true
-        axios.get("https://todo-app-7a0f5-default-rtdb.firebaseio.com/todos.json")
-        .then((response) => {
-            if (response.status === 200 && response.data !== null){
-                return response.data
-            }
-        }).then((data) => {
-            this.loadingData = false
-            const results = []
-            for (const id in data){
-                results.push({
-                    id: id,
-                    title: data[id].title,
-                    description: data[id].description,
-                    status: data[id].status,
-                    priority: data[id].priority,
-                })
-            }
-            this.todos = results
-        }).catch(error => {
-            this.loadingData = false
-            console.log(error)
-            this.fetchError = true
-        })
-    },
-    deleteTodoItem(id){
-        axios.delete('https://todo-app-7a0f5-default-rtdb.firebaseio.com/todos/' + id.toString() + '.json')
-        .then(response => {
-            if (response.status === 200){
-                this.deleteMessage = "Task deleted successfully"
-            }
-            
-      });
-    }
+            this.loadingData = true
+            axios.get("https://todo-app-7a0f5-default-rtdb.firebaseio.com/todos.json")
+            .then((response) => {
+                if (response.status === 200 && response.data !== null){
+                    return response.data
+                }
+            }).then((data) => {
+                this.loadingData = false
+                const results = []
+                for (const id in data){
+                    results.push({
+                        id: id,
+                        title: data[id].title,
+                        description: data[id].description,
+                        status: data[id].status,
+                        priority: data[id].priority,
+                    })
+                }
+                this.todos = results
+            }).catch(error => {
+                this.loadingData = false
+                console.log(error)
+                this.fetchError = true
+            })
+        },
+        deleteTodoItem(id){
+            axios.delete('https://todo-app-7a0f5-default-rtdb.firebaseio.com/todos/' + id.toString() + '.json')
+            .then(response => {
+                if (response.status === 200){
+                    this.deleteMessage = "Task deleted successfully"
+                    this.fetchTodos()
+                }
+                
+            });
+        }
     },
     mounted(){
         this.fetchTodos()
