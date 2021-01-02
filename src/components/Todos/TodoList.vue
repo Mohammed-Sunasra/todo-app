@@ -1,13 +1,16 @@
 <template>
         <!-- <p v-if="loadingData">Loading Data.......</p>
         <p v-else-if="todosExist">No data found</p> -->
+        <p v-if="deletedSuccessfully" :class="{'delete-success': deletedSuccessfully}">{{ deleteMessage }}</p>
         <todo-item v-for="todo in todos" :key="todo.id"
                 :id="todo.id"
                 :title="todo.title"
                 :description="todo.description"
                 :status="todo.status"
-                :priority="todo.priority">
+                :priority="todo.priority"
+                @delete-todo="deleteTodoItem">
         </todo-item>
+        
         
 </template>
 
@@ -19,7 +22,16 @@ export default {
     data(){
         return {
             todos: [],
-            loadingData: false
+            loadingData: false,
+            deleteMessage: null
+        }
+    },
+    computed: {
+        deletedSuccessfully(){
+            return this.deleteMessage !== null
+        },
+        todosExist(){
+            return this.loadingData === false && this.todos && this.todos.length > 0
         }
     },
     components: {
@@ -38,7 +50,7 @@ export default {
             const results = []
             for (const id in data){
                 results.push({
-                    id: data[id],
+                    id: id,
                     title: data[id].title,
                     description: data[id].description,
                     status: data[id].status,
@@ -51,15 +63,25 @@ export default {
             console.log(error)
             this.fetchError = true
         })
-    }
     },
-    computed: {
-        todosExist(){
-            return this.loadingData === false && this.todos && this.todos.length > 0
-        }
+    deleteTodoItem(id){
+        axios.delete('https://todo-app-7a0f5-default-rtdb.firebaseio.com/todos/' + id.toString() + '.json')
+        .then(response => {
+            if (response.status === 200){
+                this.deleteMessage = "Task deleted successfully"
+            }
+            
+      });
+    }
     },
     mounted(){
         this.fetchTodos()
     }
 }
 </script>
+
+<style scoped>
+.delete-success {
+    color: green;
+}
+</style>

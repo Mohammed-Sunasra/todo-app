@@ -41,6 +41,9 @@
         <div class="form-control">
             <p v-if="invalidInput">Please make sure you enter all the details</p>
         </div>
+        <div class="form-control">
+            <p v-if="addedSuccessfully" :class="{'add-success': addedSuccessfully}">{{ successMessage }}</p>
+        </div>
     </form>
 </template>
 
@@ -55,7 +58,13 @@ export default {
             status: '',
             priority: '',
             invalidInput: false,
-            errorMessage: ' '
+            errorMessage: '',
+            successMessage: null
+        }
+    },
+    computed: {
+        addedSuccessfully(){
+            return this.successMessage !== null
         }
     },
     methods: {
@@ -72,6 +81,13 @@ export default {
         }).then(response => {
             if (response.status !== 200){
                 throw new Error('Could not save data') 
+            }
+            else if (response.status === 200){
+                this.title = '',
+                this.description = ''
+                this.status = ''
+                this.priority = ''
+                this.successMessage = "Task added successfully"
             }
         }).catch(error => {
             console.log(error)
@@ -118,6 +134,10 @@ textarea {
 
 select {
   width: auto;
+}
+
+.add-success {
+    color: green;
 }
 
 input[type='checkbox'],
